@@ -1,6 +1,8 @@
 # Hybrid-Simulation
 Towards connecting diverse simulation worlds.
 
+We take Cooja and Omnetpp as an example here.
+
 1. Replace the SerialSocketServer.java in Cooja -- i.e., contiki/tools/cooja/apps/serial_socket/java/SerialSocketServer.java
 
 2. Run Cooja simulation with simulte sensor node using the TinyOS code -- /TinyOS/PeriodicSender/build/telosb/main.exe
