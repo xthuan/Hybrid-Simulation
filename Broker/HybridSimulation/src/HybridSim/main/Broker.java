@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
  
-public class Broker extends Thread{
+public class Broker{
 	public int ID = 255;
     private String IP_ADDR = "localhost";
     private int C_PORT = 4242;
@@ -37,10 +37,13 @@ public class Broker extends Thread{
 			O_OUTPUT = O_SOCKET.getOutputStream();
 			
 			System.out.println("#BROKER -- Writing a hi message to Cooja node socket "+this.C_SOCKET+" and Omnet node socket "+this.O_SOCKET);  
-			handleMsgFromCooja("Hi");
-			handleMsgFromOmnetpp("Hi");
+			handleMsgFromCooja("HiFromCooja");
+			handleMsgFromOmnetpp("HiFromOmnetpp");
 			
-			this.start();
+			CoojaTread ct = new CoojaTread();  
+			OmnetppTread ot = new OmnetppTread();
+	        ct.start();
+	        ot.start();
 			
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
@@ -51,36 +54,6 @@ public class Broker extends Thread{
 		}
     }
     
-    @Override
-    public void run() {
-        super.run();
-        try {
-        	//handle msg from cooja
-            byte[] cbuf = new byte[1024];
-            int clen = 0;
-            String cbuffer = "";
-            while ((clen = C_INPUT.read(cbuf)) != -1) {
-                //System.out.println(new String(cbuf, 0, clen));
-                cbuffer = new String(cbuf, 0, clen);
-                System.out.println(cbuffer);
-                handleMsgFromCooja(cbuffer);
-            }
-            
-            //handle msg from omnetpp
-            byte[] obuf = new byte[1024];
-            int olen = 0;
-            String obuffer = "";
-            while ((olen = O_INPUT.read(obuf)) != -1) {
-                //System.out.println(new String(obuf, 0, olen));
-                obuffer = new String(obuf, 0, olen);
-                handleMsgFromOmnetpp(obuffer);
-            }
-            
-                        
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
     public void handleMsgFromCooja(String msg){
     	//ToDo
     	//Translate/reformate data
@@ -110,44 +83,46 @@ public class Broker extends Thread{
 			e.printStackTrace();
 		}
     }
+ 
+    class CoojaTread extends Thread{
+        public void run(){
+        	//handle msg from cooja
+            byte[] cbuf = new byte[1024];
+            int clen = 0;
+            String cbuffer = "";
+            try {
+				while ((clen = C_INPUT.read(cbuf)) != -1) {
+					System.out.println("MSG RECVED FROM COOJA: ");
+				    //System.out.println(new String(cbuf, 0, clen));
+				    cbuffer = new String(cbuf, 0, clen);
+				    System.out.println(cbuffer);
+				    handleMsgFromCooja(cbuffer);
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
+    }
+
+    class OmnetppTread extends Thread{
+        public void run(){
+        	//handle msg from omnetpp
+            byte[] obuf = new byte[1024];
+            int olen = 0;
+            String obuffer = "";
+            try {
+				while ((olen = O_INPUT.read(obuf)) != -1) {
+					System.out.println("MSG RECVED FROM OMNETPP: ");
+				    //System.out.println(new String(obuf, 0, olen));
+				    obuffer = new String(obuf, 0, olen);
+				    handleMsgFromOmnetpp(obuffer);
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
+    }
     
-//    public static void main(String[] args) {  
-//        System.out.println("Client started");  
-//        System.out.println(" when command of \"OK\" is received, client terminates.\n"); 
-//        while (true) {  
-//            Socket socket = null;
-//            try {
-//                   
-//                DataInputStream input = new DataInputStream(socket.getInputStream());  
-//
-//                DataOutputStream out = new DataOutputStream(socket.getOutputStream());  
-//                System.out.print("Input: \t");  
-//                String str = new BufferedReader(new InputStreamReader(System.in)).readLine();  
-//                out.writeUTF(str); 
-//                
-//                String ret = input.readUTF();   
-//                System.out.println("Recved from server: " + ret);  
-//  
-//                //if ("OK".equals(ret)) {  
-//                //    System.out.println("Client shutting down");  
-//                //    Thread.sleep(500);  
-//                //    break;  
-//                //}  
-//                
-//                //out.close();
-//                //input.close();
-//            } catch (Exception e) {
-//                System.out.println("Client Error:" + e.getMessage()); 
-//            } finally {
-//                if (socket != null) {
-//                    try {
-//                        socket.close();
-//                    } catch (IOException e) {
-//                        socket = null; 
-//                        System.out.println("Client finally Error:" + e.getMessage()); 
-//                    }
-//                }
-//            }
-//        }  
-//    }  
 }

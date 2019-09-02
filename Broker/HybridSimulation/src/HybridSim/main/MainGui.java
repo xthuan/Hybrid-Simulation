@@ -78,7 +78,7 @@ public class MainGui extends JFrame{
 		
         tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
         
-        String[] columnNames_1 = {"From SN","To SN","Message Contents"};
+        String[] columnNames_1 = {"From","To","Message Contents"};
         
         String [][]tableVales_1={}; 
         tableModel = new DefaultTableModel(tableVales_1,columnNames_1);
